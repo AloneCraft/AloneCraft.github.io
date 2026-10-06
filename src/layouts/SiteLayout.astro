@@ -1,0 +1,49 @@
+---
+// ブランドページ（Starlight 外）の共通レイアウト。
+import '../styles/site.css';
+import { type Lang, otherLang, t } from '../i18n/ui';
+
+interface Props {
+	lang: Lang;
+	title: string;
+	description: string;
+	/** 同じページの他言語版を作るための、言語の後ろのパス（例: "omni/"）。 */
+	path: string;
+	theme?: 'neutral' | 'omni';
+}
+
+const { lang, title, description, path, theme = 'neutral' } = Astro.props;
+const alt = otherLang(lang);
+const current = Astro.url.pathname;
+const docsHref = `/${lang}/omni/docs/`;
+---
+
+<!doctype html>
+<html lang={lang} class={theme === 'omni' ? 'theme-omni' : undefined}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="alternate" hreflang={alt} href={`/${alt}/${path}`} />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+	</head>
+	<body>
+		<header class="site-header">
+			<div class="wrap">
+				<a class="brand" href={`/${lang}/`}>AloneCraft</a>
+				<nav class="site-nav" aria-label={t(lang, 'nav.products')}>
+					<a href={`/${lang}/omni/`} aria-current={current.startsWith(`/${lang}/omni/`) ? 'page' : undefined}>Omni</a>
+					<a href={docsHref}>{t(lang, 'nav.docs')}</a>
+					<a class="lang-switch" href={`/${alt}/${path}`} hreflang={alt} lang={alt}>{t(lang, 'nav.lang')}</a>
+				</nav>
+			</div>
+		</header>
+		<main>
+			<slot />
+		</main>
+		<footer class="site-footer">
+			<div class="wrap">{t(lang, 'footer.note')}</div>
+		</footer>
+	</body>
+</html>

@@ -1,0 +1,21 @@
+---
+description: "A component that draws the Renderer or Terrain on the same GameObject with the identity mapping while keeping the Radial shader."
+---
+`RadialIdentityWarp` is for comparing the original URP shader, Radial identity, and Radial logarithmic side by side with the same camera in the same frame. It affects the Renderer or Terrain on the same GameObject. It has no settings.
+
+- An identity Renderer is drawn with its actual Transform and Unity's bounds. Culling is the same test as URP.
+- It is removed from [Scene BRG](../../../docs/guides/scene-brg/) and drawn through the per-Renderer path (MaterialPropertyBlock), because Scene BRG has no way to switch individual instances to the identity mapping.
+- For a Terrain, it passes the identity values to the Terrain's own rendering without creating unsaved copies.
+- Enabling or disabling it reselects the render targets on the next update.
+
+For all the components that change the mapping, see [The Radial mapping and View Scale](../../../docs/concepts/radial-mapping/).
+
+<!-- members -->
+
+### IsApplied(Renderer)
+
+Returns `true` if the GameObject of `renderer` has an enabled `RadialIdentityWarp`. Returns `false` when the GameObject is inactive, the component is disabled, or `renderer` is `null`.
+
+### IsApplied(Terrain)
+
+Returns `true` if the GameObject of `terrain` has an enabled `RadialIdentityWarp`. Returns `false` when the GameObject is inactive, the component is disabled, or `terrain` is `null`.

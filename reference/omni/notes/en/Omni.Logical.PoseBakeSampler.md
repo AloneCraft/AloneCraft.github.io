@@ -1,0 +1,60 @@
+---
+description: "Functions that compute values at any time from baked samples, staying in Logical form."
+---
+A set of static functions that compute values at any time from baked samples ([PoseBake](../pose-bake/) and [PoseBakeChannel](../pose-bake-channel/)), staying in Logical form. They touch neither the Scene nor components, so you can use them directly from Edit Mode tests. They make no allocations at run time.
+
+Use them in two steps:
+
+1. `TryResolveSample` finds the indices of the surrounding samples and the fraction within the interval from a time.
+2. Pass the indices and fraction to the `TrySample*` functions to interpolate each value.
+
+```csharp
+using L = Omni.Logical;
+
+if (L.PoseBakeSampler.TryResolveSample(bake, time, out int i, out int next, out L.Scalar t, out var rejection) &&
+    L.PoseBakeSampler.TrySamplePosition(channel, i, next, t, out L.Position3 position) &&
+    L.PoseBakeSampler.TrySampleRotation(channel, i, next, t, out L.Quaternion rotation))
+{
+    // use position and rotation
+}
+```
+
+For the functions that take a `float` fraction (field of view, clip range, light), convert `t` to `float` (`t.TryToFloat(out float f)`) and pass that. Times outside the baked range are not rejected; they hold at the edge sample. Switching to another path only at the moment the time slips slightly outside the range (at the end of the sequence, or through rounding) would make the picture jump. See [Sequencer and Pose Bake](../../../docs/guides/sequencer/) for details.
+
+<!-- members -->
+
+### TryResolveSample
+
+From the time `timeSeconds` (seconds, sequence time), finds the index of the sample that starts the interval (`index`), the index of the one that ends it (`nextIndex`), and the fraction within the interval (`fraction`, a Logical value from 0 to 1). Before the first sample it holds at the first, and after the last sample it holds at the last; in those cases `index` and `nextIndex` are the same and `fraction` is 0. Returns `false` and sets `rejection` to `MissingAsset` when `bake` is `null`, to `EmptySamples` when the sample count or interval is 0 or less, and to `InterpolationFailed` when the fraction cannot be converted to a Logical value.
+
+### TrySamplePosition
+
+Linearly interpolates the positions of the surrounding samples, staying in Logical form. Returns `false` when `channel` is `null`, there are no position samples, an index is out of range, or the interpolation overflows. When `index` equals `nextIndex` or the fraction is 0, returns the value at `index` without interpolating.
+
+### TrySampleRotation
+
+Interpolates the rotations of the surrounding samples with normalized linear interpolation (nlerp). Returns `false` when they cannot be read or the result cannot be normalized. When `index` equals `nextIndex` or the fraction is 0, returns the value at `index` without interpolating or normalizing.
+
+### TrySampleDistance
+
+Linearly interpolates the camera distances of the surrounding samples, staying in Logical form. Returns `false` when they cannot be read or the interpolation overflows.
+
+### TrySampleLookOffset
+
+Linearly interpolates the look-at offsets of the surrounding samples, staying in Logical form. Returns `false` when they cannot be read or the interpolation overflows.
+
+### TrySampleFieldOfView
+
+Linearly interpolates the fields of view (degrees) of the surrounding samples as `float`. Field of view is not a spatial quantity, so it stays `float`. Returns `false` when they cannot be read.
+
+### TrySampleClipRange
+
+Interpolates the near and far clip of the surrounding samples. Clip distances change by orders of magnitude, so they are interpolated logarithmically, not linearly. If either value is 0 or less, linear interpolation is used. Returns `false` when they cannot be read.
+
+### TrySampleLightShading
+
+Linearly interpolates the light intensity and color of the surrounding samples. Returns `false` when they cannot be read, with `intensity` set to 0 and `color` set to white.
+
+### TryFractionTo
+
+Converts a `double` fraction from 0 to 1 into a Logical value. Values of 0 or less become 0 and values of 1 or more become 1. A single `float` would drop the mantissa to 24 bits, so the value is taken in as two `float`s, a high part and a residual, keeping about 48 bits of resolution. Returns `false` when the conversion fails, with `result` set to 0.

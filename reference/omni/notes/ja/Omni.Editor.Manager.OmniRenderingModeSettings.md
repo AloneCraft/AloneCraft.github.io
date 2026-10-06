@@ -1,0 +1,43 @@
+---
+description: "Omni Manager の切替で選んだ描画方式（対数／標準）を、プロジェクトに記録する Editor の静的クラスです。"
+---
+`OmniRenderingModeSettings` は、[Omni Manager](../omni-manager/) の「標準レンダリング／対数レンダリング」で選んだ描画方式を、`ProjectSettings/Omni/RenderingMode.json` に記録します（[Omni が作るファイル](../../files/project-files/)）。Editor 専用です。
+
+Camera に付けた `RadialCamera` は Scene の変更なので、保存しないと失われます。そこで、対数が記録されている間は、Omni が次のときに対象の Camera へ `RadialCamera` を自動で付けて有効にします。
+
+- Scene を開いたとき、Domain Reload の後、Play を終えて編集に戻ったとき
+- Play を始めたとき、Play 中に Scene を読み込んだとき、Player をビルドするとき
+
+自動で付けた `RadialCamera` は Undo に記録せず、Scene を未保存の状態にもせず、Scene のファイルにも書き出しません。記録が対数でなくなると、自動で付けた分を外します。標準が記録されていても、Scene に保存されている `RadialCamera` は外しません。
+
+`Mode` の値（`OmniRenderingModeSettings.RenderingMode`）は次のとおりです。
+
+| 値 | 意味 |
+| --- | --- |
+| `Unset` | 記録が無い。ファイルが無いか、読めない。自動では何もしない |
+| `Standard` | 標準描画が記録されている |
+| `Logarithmic` | 対数描画が記録されている。`RadialCamera` を自動で付ける |
+
+切替の流れは [標準描画と対数描画を切り替える](../../../docs/getting-started/switch-rendering/) を見てください。
+
+<!-- members -->
+
+### Mode
+
+記録されている描画方式です。最初に読んだときにファイルから読み、その後は覚えた値を返します。ファイルが無い、または読めないときは `Unset` です（読めないときは Console に警告を出します）。
+
+### AutoApplyActive
+
+`RadialCamera` の自動の付与が働くときに `true` です。`Mode` が `Logarithmic` で、`Suspend` で止められていないときだけ `true` になります。
+
+### SetMode
+
+描画方式を記録し、読み込んだ Scene へすぐ反映します。対数なら `RadialCamera` を付け、それ以外なら自動で付けた分を外します。記録するだけで、Material の変換などの切替の処理は行いません。今と同じ値のとき、または `Suspend` で止めている間は、何もしません。
+
+### Suspend
+
+自動の付与を一時的に止めます。テストの実行中などに使います。呼んだ回数を数えるので、同じ回数だけ `Resume` を呼びます。止めている間は `SetMode` も記録を変えません。
+
+### Resume
+
+`Suspend` を 1 回分取り消します。すべての `Suspend` を取り消すと、自動の付与が再び働きます。`Suspend` を呼んでいないときは何もしません。

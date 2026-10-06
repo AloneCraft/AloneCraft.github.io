@@ -1,0 +1,30 @@
+---
+// ルート（/）の既定言語は未定（SPEC.md 12 章）。決まるまでは、ブラウザーの言語で振り分け、
+// スクリプトが動かない環境では両方のリンクを出す。
+import '../styles/site.css';
+---
+
+<!doctype html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>AloneCraft</title>
+		<link rel="alternate" hreflang="ja" href="/ja/" />
+		<link rel="alternate" hreflang="en" href="/en/" />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<script is:inline>
+			(function () {
+				var langs = navigator.languages || [navigator.language || ''];
+				var ja = langs.some(function (l) { return /^ja\b/i.test(l); });
+				location.replace(ja ? '/ja/' : '/en/');
+			})();
+		</script>
+	</head>
+	<body>
+		<main class="wrap section">
+			<h1>AloneCraft</h1>
+			<p><a href="/ja/" hreflang="ja" lang="ja">日本語</a> · <a href="/en/" hreflang="en" lang="en">English</a></p>
+		</main>
+	</body>
+</html>

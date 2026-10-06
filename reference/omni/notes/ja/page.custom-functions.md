@@ -1,0 +1,38 @@
+---
+description: "RadialWarpNode.hlsl の Shader Graph の Custom Function の、入力と出力、空間、変換器が足す場所です。"
+---
+`Assets/Omni/Runtime/Sharders/RadialWarpNode.hlsl` にある、Shader Graph の Custom Function（Type = File）の関数です。どの関数にも `_float` 版と `_half` 版があります。これらのノードは、対数描画への切替のときに変換器が Graph へ足します。自分で置く必要はありません。
+
+| Graph | 変換器が足すノード |
+| --- | --- |
+| URP の Lit、Unlit | `RadialKeepObjectPosition`。Emission のブロックを持つ Graph には、`RadialGetLogicalViewDirection` と `RadialPreserveEmission` も足す |
+| URP の Decal | `RadialPreserveDecalAlpha` |
+| URP の Fullscreen | `RadialPreserveFullscreenColor`。Depth Write を有効にした Graph には `RadialFullscreenDepth` も足す |
+
+値をそのまま通すだけの関数があるのは、Graph にこの include を保たせ、include の中の置き換え（頂点のフック、深度の復元）を有効にするためです。変換の全体は [Shader Graph と独自の Shader](../../../docs/guides/shader-graph/) を、include の役割は [include ファイル](../includes/) を見てください。
+
+<!-- members -->
+
+### RadialKeepObjectPosition
+
+頂点の Position のための関数です。`Out` には、Object 空間の `PositionOS` をそのまま返します。実際の Radial の投影は、頂点のフック（`RadialVertexHooks.hlsl`）が行います。Absolute World を通して Object 空間へ戻すと、大きな Logical 座標で頂点の精度が壊れるため、座標は変換しません。ほかの入力（`EyeRelative`、`EyeRelativeExponent`、`S`、`Mode`、`LinearR`、`Log2ViewScale`、`ViewRow0`〜`ViewRow2`）は Blackboard の `_RadialGlobal_*` のプロパティにつながり、そのプロパティを Graph に保つためだけにあります。値は読みません。変換器は、変換するすべての Lit と Unlit の Graph で、このノードを Vertex の Position のブロックの手前に入れます。元の Position の入力（風や波などの頂点の変形）は `PositionOS` につなぎ直すので失われません。
+
+### RadialGetLogicalViewDirection
+
+Object 空間の位置 `PositionOS` から、その頂点の Logical の視線の方向を返します。`Out` は world 空間の正規化した方向で、URP の View Direction と同じく表面からカメラへ向きます。Radial の変換を受けない Renderer では、URP の標準の視線の方向を返します。頂点のフックが無効な Pass（ShadowCaster、Meta など）では `(0, 0, 1)` を返します。変換器は、Emission のブロックを持つ Graph で、このノードの出力を頂点の Custom Interpolator（`OmniLogicalViewDirection`）に入れ、fragment へ運びます。
+
+### RadialPreserveEmission
+
+`Out` には、元の Emission（`OriginalEmission`）をそのまま返します。同時に、Custom Interpolator で受けた `LogicalViewDirection` を、その fragment の Logical の視線として保存し、PBR の照明の初期化がそれを使うようにします。保存した値は、同じ fragment の呼び出しの中でだけ有効です。変換器は、Emission のブロックの手前にこのノードを入れ、元の Emission の入力を `OriginalEmission` につなぎます。
+
+### RadialPreserveDecalAlpha
+
+`Out` には、元の Alpha（`OriginalAlpha`）をそのまま返します。Decal の Graph にこの include を保たせ、Decal Projector の Pass で、深度から復元した位置を Radial の逆の写像で戻す処理を有効にするためのノードです。変換器は、URP の Decal の Graph の Alpha のブロックの手前に入れます。Affect BaseColor か Affect Emission が有効でない Graph は、Alpha が生成されないので変換しません。
+
+### RadialPreserveFullscreenColor
+
+`Out` には、元の色（`OriginalColor`）をそのまま返します。Fullscreen の Graph にこの include を保たせ、Scene Depth の置き換え（写像した後の深度を物理の深度へ戻す）を有効にするためのノードです。変換器は、Fullscreen の Graph の Base Color のブロックの手前に入れます。
+
+### RadialFullscreenDepth
+
+Depth Write を有効にした Fullscreen の Graph で、Graph が書く物理の深度を、深度バッファと同じ写像した後の深度へ直します。入力は、画面の位置 `ScreenPosition`（Screen Position ノードの Default）、深度 `Depth`、`Mode`（0 = Eye、1 = Linear01、2 = Raw）です。`Out` は `Depth` と同じ表し方の深度です。写像は視線の向きを変えないので、同じ画素の視線の上で深度だけを置き換えます。Radial が無効なとき、平行投影のとき、Fullscreen 以外の Graph のときは、`Depth` をそのまま返します。光線が当たらない画素の「遠方」の印（Eye は 1e20 以上、Linear01 は 1 以上、Raw は far の値）も、そのまま返します。変換器は、Graph の Depth Write Mode に合わせた深度のブロックの手前にこのノードを入れ、`Mode` にその Mode を設定します。

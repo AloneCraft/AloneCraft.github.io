@@ -1,0 +1,31 @@
+/* Starlight（ドキュメント）の色。ライト／ダークは Starlight の切替に従う。 */
+
+:root {
+	--sl-color-accent-low: #0c2a3a;
+	--sl-color-accent: #3aa3d6;
+	--sl-color-accent-high: #bfe6f8;
+	--sl-color-white: #ffffff;
+	--sl-color-gray-1: #e8edf3;
+	--sl-color-gray-2: #c3ccd7;
+	--sl-color-gray-3: #8b98a8;
+	--sl-color-gray-4: #556170;
+	--sl-color-gray-5: #2a3340;
+	--sl-color-gray-6: #141b24;
+	--sl-color-black: #070a0e;
+	--sl-font: system-ui, -apple-system, 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic UI', sans-serif;
+}
+
+:root[data-theme='light'] {
+	--sl-color-accent-low: #d4ecf8;
+	--sl-color-accent: #1b6c99;
+	--sl-color-accent-high: #0e3a54;
+	--sl-color-white: #10151b;
+	--sl-color-gray-1: #1d252e;
+	--sl-color-gray-2: #333d49;
+	--sl-color-gray-3: #55606d;
+	--sl-color-gray-4: #8a95a1;
+	--sl-color-gray-5: #c5ccd4;
+	--sl-color-gray-6: #eef1f4;
+	--sl-color-gray-7: #f7f8fa;
+	--sl-color-black: #ffffff;
+}

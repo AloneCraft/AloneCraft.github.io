@@ -1,0 +1,136 @@
+# リファレンスに載せる Omni の公開 API（SPEC.md 8 章）。
+# ここに無い public 型（RadialGlobalRenderSystem など内部向けのもの）は載せない。
+# 型が消えたり名前が変わったりすると、scripts/gen-reference.mjs は失敗する。
+#   type:    完全名（tools/ApiExtract の出力の fullName）
+#   slug:    ページのファイル名（省略すると型名の kebab-case）
+#   title:   ページの見出し（省略すると型名）
+#   exclude: 載せないメンバーの ID
+# サイドバーのグループは astro.config.mjs のカテゴリと一致させる。
+
+categories:
+  - id: components
+    types:
+      - type: Omni.RadialCamera
+      - type: Omni.RadialSettings
+      - type: Omni.RadialCameraToggle
+      - type: Omni.Logical.Transform
+        slug: logical-transform
+        title: Logical Transform
+      - type: Omni.RadialIdentityWarp
+      - type: Omni.Logical.RadialRigidAnchor
+      - type: Omni.BatchRendering.RadialSceneBatchRendererExclusion
+      - type: Omni.Logical.DetachResult
+      - type: Omni.Logical.DetachStatus
+      - type: Omni.Logical.TransformHierarchy
+
+  - id: lighting
+    types:
+      - type: Omni.Lighting.OmniLightProbeSpace
+      - type: Omni.Lighting.OmniLightProbeSpaceRequirement
+      - type: Omni.Lighting.OmniAdaptiveProbeVolumeSpace
+      - type: Omni.Lighting.OmniAdaptiveProbeVolumeSpaceRequirement
+      - type: Omni.Lighting.OmniLightingSpace
+
+  - id: observer
+    types:
+      - type: Omni.Observer.RadialObserverRig
+      - type: Omni.Observer.RadialObserverSlot
+      - type: Omni.Observer.RadialObserverOrbit
+      - type: Omni.Observer.RadialObserverChannelGuard
+      - type: Omni.Observer.ObserverSlotKind
+      - type: Omni.Observer.ObserverLayoutPreset
+      - type: Omni.Observer.ObserverCorner
+
+  - id: logical
+    types:
+      - type: Omni.Logical.Scalar
+      - type: Omni.Logical.ScalarField
+      - type: Omni.Logical.RotationScalar
+      - type: Omni.Logical.Vector3
+      - type: Omni.Logical.Position3
+      - type: Omni.Logical.Quaternion
+      - type: Omni.Logical.Matrix3x3
+      - type: Omni.Logical.Math
+      - type: Omni.Logical.Precision
+
+  - id: units
+    types:
+      - type: Omni.Units.Angle
+      - type: Omni.Units.AngularVelocity
+      - type: Omni.Units.Duration
+      - type: Omni.Units.TimeScale
+      - type: Omni.Units.UnitInterval
+      - type: Omni.Units.Mass
+      - type: Omni.Units.Energy
+      - type: Omni.Units.GravitationalParameter
+
+  - id: sequencer
+    types:
+      - type: Omni.Logical.PoseBake
+      - type: Omni.Logical.PoseBakeChannel
+      - type: Omni.Logical.PoseBakeChannelKind
+      - type: Omni.Logical.PoseBakeSampler
+      - type: Omni.Logical.PoseBakeRejection
+      - type: Omni.Logical.BakePlaybackController
+      - type: Omni.Logical.PoseBakeTrack
+      - type: Omni.Logical.PoseBakeClip
+      - type: Omni.Logical.LightBakeTrack
+
+  - id: celestial
+    types:
+      - type: Omni.Celestial.CelestialCatalogAsset
+      - type: Omni.Celestial.CelestialBodyAuthoring
+      - type: Omni.Celestial.CelestialCatalogRuntime
+      - type: Omni.Celestial.CelestialCatalogSnapshot
+      - type: Omni.Celestial.CelestialBodySnapshot
+
+  - id: editor
+    types:
+      - type: Omni.Editor.Manager.OmniRenderingModeSettings
+
+  - id: shader
+    pages:
+      - slug: includes
+        kind: hlsl-includes
+        title: { ja: include ファイル, en: Include files }
+        includes:
+          - RadialWarpNode.hlsl
+          - RadialVertexInject.hlsl
+          - RadialInject.hlsl
+          - RadialVertexHooks.hlsl
+          - RadialObjectMotionVectors.hlsl
+          - RadialWarp.hlsl
+      - slug: custom-functions
+        kind: hlsl-functions
+        file: Assets/Omni/Runtime/Sharders/RadialWarpNode.hlsl
+        title: { ja: Custom Function, en: Custom Function }
+        functions:
+          - RadialKeepObjectPosition
+          - RadialGetLogicalViewDirection
+          - RadialPreserveEmission
+          - RadialPreserveDecalAlpha
+          - RadialPreserveFullscreenColor
+          - RadialFullscreenDepth
+      - slug: globals
+        kind: shader-identifiers
+        title: { ja: グローバルのプロパティと define, en: Global properties and defines }
+        identifiers:
+          - _OmniRadialCamera_State
+          - _OmniRadialCamera_Curve
+          - _OmniRadialCamera_EyeRelative
+          - _OmniRadialCamera_OriginRelative
+          - _OmniRadialCamera_ViewRow0
+          - _OmniRadialCamera_ViewRow1
+          - _OmniRadialCamera_ViewRow2
+          - _OmniRadialCamera_PreviousState
+          - _OmniRadialCamera_PreviousCurve
+          - _OmniRadialCamera_PreviousEyeRelative
+          - _OmniRadialCamera_PreviousOriginRelative
+          - _OmniRadialCamera_PreviousViewRow0
+          - _OmniRadialCamera_PreviousViewRow1
+          - _OmniRadialCamera_PreviousViewRow2
+          - _RadialGlobal_UseRadialTransform
+          - OMNI_RADIAL_MODE_SMOOTHLOG
+          - OMNI_RADIAL_MODE_IDENTITY
+          - OMNI_RADIAL_HOOKS_DISABLED
+          - OMNI_RADIAL_EXPECT_ACTIVE

@@ -1,0 +1,25 @@
+{
+  "name": "alonecraft-website",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "gen:api": "node scripts/gen-api.mjs",
+    "gen:reference": "node scripts/gen-reference.mjs",
+    "check:reference": "node scripts/gen-reference.mjs --strict && git diff --exit-code -- src/content/docs",
+    "check:links": "node scripts/check-links.mjs"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "^7.3.2",
+    "@astrojs/starlight": "^0.42.5",
+    "astro": "^7.3.6",
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "yaml": "^2.9.1"
+  }
+}

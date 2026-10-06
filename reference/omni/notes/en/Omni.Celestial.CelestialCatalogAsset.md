@@ -1,0 +1,38 @@
+---
+description: "The single source asset for celestial physical constants (diameter, mass, axial tilt, orbital elements)."
+---
+A ScriptableObject that holds the physical constants of celestial bodies (diameter, mass, axial tilt, orbital elements). It is the single source of these values, so that prefabs, Scenes and rendering data never duplicate radii, masses or orbits.
+
+- Create one with Assets > Create > Omni > Celestial > Catalog.
+- The bundled demos (EarthToMoon, SolarSystem) read the shared catalog at `Assets/Omni/Resources/Omni/CelestialCatalog.asset` through [CelestialCatalogRuntime](../celestial-catalog-runtime/).
+- Each body's values are written in [CelestialBodyAuthoring](../celestial-body-authoring/) as decimal strings. Always convert to a validated [CelestialCatalogSnapshot](../celestial-catalog-snapshot/) (for example with `TryCreateSnapshot`) before reading them.
+
+<!-- members -->
+
+### m_Revision
+
+A revision number to increase when you intentionally change the content. Must be 1 or more. [CelestialCatalogRuntime](../celestial-catalog-runtime/) keeps using its previous result while the asset and the revision number stay the same.
+
+### m_Bodies
+
+The array of body records ([CelestialBodyAuthoring](../celestial-body-authoring/)). At least one is required.
+
+### Revision
+
+Returns the revision number.
+
+### TryCreateSnapshot
+
+Validates the current content and, only if everything is valid, creates an immutable [CelestialCatalogSnapshot](../celestial-catalog-snapshot/). On failure it returns `false` with `snapshot` set to `null`. `validation` receives every error found. Each call validates and builds anew.
+
+### Validate
+
+Only validates the current content and returns the result (`CelestialCatalogValidationResult`). Use `IsValid` to check for errors, `Issues` for the list of errors, and `ToDisplayString()` for a display string.
+
+### CreateSnapshotOrThrow
+
+Creates a [CelestialCatalogSnapshot](../celestial-catalog-snapshot/) from the current content. When the content is invalid, throws an `InvalidOperationException` that contains all errors.
+
+### ConfigureForEditor
+
+Replaces the revision number and body records together. Available only in the Editor (`UNITY_EDITOR`). The array and each record are copied, so changing the original array afterwards does not affect the asset. A `null` `bodies` empties the list. It does not save the asset (it does not call `EditorUtility.SetDirty` or similar).

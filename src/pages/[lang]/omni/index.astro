@@ -1,0 +1,251 @@
+---
+import { Image } from 'astro:assets';
+import SiteLayout from '../../../layouts/SiteLayout.astro';
+import { type Lang, langs, t } from '../../../i18n/ui';
+import blackHoleFall from '../../../assets/omni/black-hole-fall.jpg';
+import cosmicWeb from '../../../assets/omni/cosmic-web.jpg';
+import milkyWay from '../../../assets/omni/milky-way-disk.jpg';
+
+export function getStaticPaths() {
+	return langs.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const docs = `/${lang}/omni/docs/`;
+const start = `/${lang}/omni/docs/getting-started/requirements/`;
+
+const features = [
+	['omni.f1.title', 'omni.f1.body'],
+	['omni.f2.title', 'omni.f2.body'],
+	['omni.f3.title', 'omni.f3.body'],
+	['omni.f4.title', 'omni.f4.body'],
+	['omni.f5.title', 'omni.f5.body'],
+	['omni.f6.title', 'omni.f6.body'],
+] as const;
+
+const demos = [
+	['omni.demo.scale.title', 'omni.demo.scale.body'],
+	['omni.demo.hierarchy.title', 'omni.demo.hierarchy.body'],
+	['omni.demo.solar.title', 'omni.demo.solar.body'],
+	['omni.demo.earth.title', 'omni.demo.earth.body'],
+] as const;
+---
+
+<SiteLayout lang={lang} title="Omni | AloneCraft" description={t(lang, 'omni.description')} path="omni/" theme="omni">
+	<section class="hero">
+		<Image class="hero-image" src={cosmicWeb} alt="" widths={[850]} sizes="100vw" loading="eager" />
+		<div class="hero-shade"></div>
+		<div class="wrap hero-content">
+			<p class="kicker">{t(lang, 'omni.hero.kicker')}</p>
+			<h1>Omni</h1>
+			<p class="hero-headline">{t(lang, 'omni.hero.headline')}</p>
+			<p class="lead">{t(lang, 'omni.hero.lead')}</p>
+			<div class="button-row">
+				<a class="button primary" href={start}>{t(lang, 'omni.hero.start')}</a>
+				<a class="button secondary" href={docs}>{t(lang, 'omni.hero.docs')}</a>
+			</div>
+			<p class="note status">{t(lang, 'omni.status')}</p>
+		</div>
+	</section>
+
+	<section class="wrap section">
+		<h2>{t(lang, 'omni.numbers.title')}</h2>
+		<dl class="numbers">
+			<div class="card">
+				<dt>{t(lang, 'omni.numbers.range')}</dt>
+				<dd class="number">±3.96×10<sup>28</sup> m</dd>
+				<dd class="note">{t(lang, 'omni.numbers.rangeNote')}</dd>
+			</div>
+			<div class="card">
+				<dt>{t(lang, 'omni.numbers.resolution')}</dt>
+				<dd class="number">2<sup>−96</sup> m ≈ 1.26×10<sup>−29</sup> m</dd>
+				<dd class="note">{t(lang, 'omni.numbers.resolutionNote')}</dd>
+			</div>
+			<div class="card">
+				<dt>{t(lang, 'omni.numbers.camera')}</dt>
+				<dd class="number">{t(lang, 'omni.numbers.cameraValue')}</dd>
+				<dd class="note">{t(lang, 'omni.numbers.cameraNote')}</dd>
+			</div>
+		</dl>
+	</section>
+
+	<section class="wrap section">
+		<h2>{t(lang, 'omni.features.title')}</h2>
+		<div class="grid">
+			{
+				features.map(([title, body]) => (
+					<article class="card">
+						<h3>{t(lang, title)}</h3>
+						<p>{t(lang, body)}</p>
+					</article>
+				))
+			}
+		</div>
+	</section>
+
+	<section class="wrap section">
+		<h2>{t(lang, 'omni.demos.title')}</h2>
+		<p class="lead">{t(lang, 'omni.demos.lead')}</p>
+		<div class="gallery">
+			<figure>
+				<Image src={blackHoleFall} alt={t(lang, 'omni.demo.caption.fall')} widths={[480, 800, 1100]} sizes="(min-width: 48rem) 50vw, 100vw" />
+				<figcaption>{t(lang, 'omni.demo.caption.fall')}</figcaption>
+			</figure>
+			<figure>
+				<Image src={milkyWay} alt={t(lang, 'omni.demo.caption.mw')} widths={[480, 800, 1200]} sizes="(min-width: 48rem) 50vw, 100vw" />
+				<figcaption>{t(lang, 'omni.demo.caption.mw')}</figcaption>
+			</figure>
+		</div>
+		<div class="grid two">
+			{
+				demos.map(([title, body]) => (
+					<article class="card">
+						<h3>{t(lang, title)}</h3>
+						<p>{t(lang, body)}</p>
+					</article>
+				))
+			}
+		</div>
+	</section>
+
+	<section class="wrap section">
+		<h2>{t(lang, 'omni.req.title')}</h2>
+		<ul class="requirements">
+			<li>{t(lang, 'omni.req.unity')}</li>
+			<li>{t(lang, 'omni.req.urp')}</li>
+			<li>{t(lang, 'omni.req.input')}</li>
+			<li>{t(lang, 'omni.req.targets')}</li>
+		</ul>
+		<p><a href={start}>{t(lang, 'omni.req.more')} →</a></p>
+	</section>
+</SiteLayout>
+
+<style>
+	.hero {
+		position: relative;
+		min-height: min(88vh, 52rem);
+		display: grid;
+		align-items: end;
+		overflow: hidden;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.hero :global(.hero-image) {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: 20% 50%;
+		opacity: 0.55;
+	}
+
+	.hero-shade {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(0deg, rgb(5 7 10 / 1) 0%, rgb(5 7 10 / 0.6) 60%, rgb(5 7 10 / 0.3) 100%);
+	}
+
+	/* 広い画面では画像を右へ寄せ、文章と重ねない */
+	@media (min-width: 60rem) {
+		.hero :global(.hero-image) {
+			left: auto;
+			width: 62%;
+			opacity: 1;
+			object-position: 10% 50%;
+		}
+
+		.hero-shade {
+			background:
+				linear-gradient(90deg, rgb(5 7 10 / 1) 0%, rgb(5 7 10 / 1) 38%, rgb(5 7 10 / 0) 60%),
+				linear-gradient(0deg, rgb(5 7 10 / 1) 0%, rgb(5 7 10 / 0) 30%);
+		}
+
+		.hero-content .lead {
+			max-width: 34rem;
+		}
+	}
+
+	.hero-content {
+		position: relative;
+		padding-block: 6rem 4rem;
+	}
+
+	.hero h1 {
+		font-size: clamp(3rem, 9vw, 5.5rem);
+		line-height: 1;
+		letter-spacing: 0.06em;
+		margin: 0;
+	}
+
+	.hero-headline {
+		font-size: clamp(1.35rem, 3.2vw, 2rem);
+		line-height: 1.35;
+		font-weight: 600;
+		margin: 0.75rem 0 1.25rem;
+	}
+
+	.status {
+		margin-top: 1.5rem;
+	}
+
+	.numbers {
+		display: grid;
+		gap: 1.25rem;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+		margin: 0;
+	}
+
+	.numbers dt {
+		color: var(--muted);
+		font-size: 0.9rem;
+	}
+
+	.numbers dd {
+		margin: 0;
+	}
+
+	.number {
+		font-family: var(--font-mono);
+		font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+		color: var(--accent);
+		line-height: 1.5;
+		margin-block: 0.25rem !important;
+		overflow-wrap: anywhere;
+	}
+
+	.gallery {
+		display: grid;
+		gap: 1.25rem;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+		margin-block: 2rem;
+	}
+
+	.gallery figure {
+		margin: 0;
+	}
+
+	.gallery :global(img) {
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		object-fit: cover;
+		border-radius: 0.6rem;
+		border: 1px solid var(--border);
+		background: #000;
+	}
+
+	.gallery figcaption {
+		color: var(--muted);
+		font-size: 0.85rem;
+		margin-top: 0.5rem;
+	}
+
+	.two {
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 26rem), 1fr));
+	}
+
+	.requirements {
+		padding-left: 1.25rem;
+		margin: 0 0 1rem;
+	}
+</style>
